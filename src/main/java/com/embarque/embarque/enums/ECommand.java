@@ -1,0 +1,11 @@
+package com.embarque.embarque.enums;
+
+public enum ECommand {
+
+  EMBARCAR_AVIAO,
+  TRANSPORTAR_PASSAGEIROS,
+  DESEMBARCAR_SALA_ESPERA,
+  DESEMBARCAR_AVIAO,
+  EMBARCAR_SALA_ESPERA
+
+}
