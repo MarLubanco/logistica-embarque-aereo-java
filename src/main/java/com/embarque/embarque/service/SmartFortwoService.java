@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.ObjectUtils;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -20,17 +21,17 @@ import java.util.function.Predicate;
 @Slf4j
 public class SmartFortwoService {
 
-  SmartFortwo smartFortwo = new SmartFortwo();
   SalaEmbarque salaEmbarque = new SalaEmbarque();
   Aviao aviao = new Aviao();
 
-  public void transportarPassageiro(Pessoa motorista, Pessoa passageira) throws TransporteLotadoException, TripulacaoIncorretaException {
+  public void transportarPassageiro(SmartFortwo smartFortwo) throws TransporteLotadoException, TripulacaoIncorretaException {
     if (!ObjectUtils.isEmpty(smartFortwo)
             && smartFortwo.getLugar().equals(Lugar.SALA_ESPERA)) {
-      if (validarPermissaoEmbarque(motorista, passageira)) {
-        smartFortwo.setMotorista(motorista);
-        smartFortwo.setPassageiro(passageira);
-        embarcarPassageiro(smartFortwo.getPassageiro());
+      if (validarPermissaoEmbarque(smartFortwo.getMotorista(), smartFortwo.getPassageiro())) {
+        smartFortwo.setLugar(Lugar.AVIAO);
+        embarcarPassageiro(smartFortwo);
+      } else {
+        throw new TripulacaoIncorretaException("Não é permitida essa tripulação");
       }
     } else {
       throw new TransporteLotadoException("O SmartFortwo está com todos os lugares ocupados");
@@ -55,35 +56,28 @@ public class SmartFortwoService {
 
   public boolean validarPermissaoEmbarque(Pessoa motorista, Pessoa passageira) throws TripulacaoIncorretaException {
     Map<String, Predicate<Cargo>> perfilValidator = ImmutableMap.<String, Predicate<Cargo>>builder()
-            .put("PILOTO", cargo -> !cargo.equals("COMISSARIA"))
-            .put("POLICIAL", cargo -> cargo.equals("BANDIDO"))
-            .put("CHEFE_DE_SERVICO", cargo -> !cargo.equals("OFICIAL"))
+            .put("PILOTO", cargo -> !cargo.getNome().equals("COMISSARIA"))
+            .put("POLICIAL", cargo -> cargo.getNome().equals("PRESIDIARIO"))
+            .put("CHEFE_DE_SERVICO", cargo -> !cargo.getNome().equals("OFICIAL"))
             .build();
 
-    boolean valido =
-            perfilValidator.get(motorista.getCargo())
+   return perfilValidator.get(motorista.getCargo().getNome().toUpperCase())
                     .test(passageira.getCargo());
-    if (valido) {
-
-    } else {
-      throw new TripulacaoIncorretaException("Essa tripulação não pode ser transportada");
-    }
-    return valido;
   }
 
-  public void embarcarPassageiro(Pessoa passageiro) {
-    if (!ObjectUtils.isEmpty(passageiro)
+  public void embarcarPassageiro(SmartFortwo smartFortwo) {
+    if (!ObjectUtils.isEmpty(smartFortwo)
             && smartFortwo.getLugar().equals(Lugar.AVIAO)) {
-      aviao.setPessoaEmbarque(passageiro);
-      setLugarSalaEspera();
+      aviao.setPessoaEmbarque(smartFortwo.getPassageiro());
+      setLugarSalaEspera(smartFortwo);
     }
   }
 
-  public void setLugarSalaEspera() {
+  public void setLugarSalaEspera(SmartFortwo smartFortwo) {
     smartFortwo.setLugar(Lugar.SALA_ESPERA);
   }
 
-  public void setLugarAviao() {
+  public void setLugarAviao(SmartFortwo smartFortwo) {
     smartFortwo.setLugar(Lugar.AVIAO);
   }
 

@@ -12,8 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Pessoa {
 
-  private Long id;
-
   private Cargo cargo;
 
+  public Pessoa(String cargo) {
+    this.cargo = Cargo.valueOf(cargo);
+  }
 }

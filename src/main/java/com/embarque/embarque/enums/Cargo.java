@@ -15,4 +15,8 @@ public enum Cargo {
     this.cargo = cargo;
   }
 
+  public String getNome() {
+    return cargo;
+  }
+
 }

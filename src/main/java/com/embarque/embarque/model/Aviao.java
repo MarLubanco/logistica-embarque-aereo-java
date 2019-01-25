@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Builder
@@ -14,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Aviao {
 
-  private List<Pessoa> pessoasEmbarcadas;
+  private List<Pessoa> pessoasEmbarcadas = new ArrayList<>();
 
   public void setPessoaEmbarque(Pessoa pessoa) {
     pessoasEmbarcadas.add(pessoa);
